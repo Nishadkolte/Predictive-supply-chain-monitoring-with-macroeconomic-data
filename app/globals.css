@@ -1,0 +1,2 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: #07090f; color: #d4ddf0; font-family: 'Menlo', 'SF Mono', 'Consolas', monospace; }
