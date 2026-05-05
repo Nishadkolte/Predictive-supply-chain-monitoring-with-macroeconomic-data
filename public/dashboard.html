@@ -2,32 +2,31 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Meridian · Supply Chain Intelligence</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#07090f;color:#d4ddf0;font-family:'Menlo','SF Mono',Consolas,monospace;font-size:12px;line-height:1.5}
+html,body{background:#07090f;color:#d4ddf0;font-family:'Menlo','SF Mono','Consolas',monospace;font-size:12px;line-height:1.5;min-height:100vh}
 .lbl{font-size:9px;letter-spacing:.14em;color:#3d5272;text-transform:uppercase;margin-bottom:5px}
-.muted{color:#4e6282}
-.gn{color:#0fb97a}.am{color:#e8a428}.rd{color:#e8445a}.bl{color:#4a9ef8}
-.hbtn{font-family:inherit;font-size:10px;letter-spacing:.1em;padding:4px 12px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:3px;color:#4e6282;cursor:pointer;margin-right:6px}
-.hbtn.on{background:rgba(74,158,248,.12);border-color:rgba(74,158,248,.35);color:#4a9ef8}
-#iBar{display:flex;overflow-x:auto;scrollbar-width:none}
-#iBar::-webkit-scrollbar{display:none}
-.ibtn{font-family:inherit;font-size:9px;letter-spacing:.1em;padding:0 16px;height:36px;background:transparent;border:none;border-right:1px solid rgba(255,255,255,.06);color:#3d5272;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;flex-shrink:0;transition:all .15s}
-.ibtn:hover{color:#8a9bbf;background:rgba(255,255,255,.03)}
-.ibtn.on{color:#d4ddf0;background:rgba(74,158,248,.07);border-bottom:2px solid #4a9ef8}
-.ibtn .dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-#csInput{width:100%;background:#060810;border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:8px 12px;color:#d4ddf0;font-family:inherit;font-size:10px;outline:none}
+.muted{color:#4e6282}.am{color:#e8a428}.gn{color:#0fb97a}.rd{color:#e8445a}.bl{color:#4a9ef8}
+#hBtns button{font-family:inherit;font-size:10px;letter-spacing:.1em;padding:4px 12px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:3px;color:#4e6282;cursor:pointer;transition:all .15s}
+#hBtns button.active{background:rgba(74,158,248,.12);border-color:rgba(74,158,248,.35);color:#4a9ef8}
+#industryBar{display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none}
+#industryBar::-webkit-scrollbar{display:none}
+.ind-btn{font-family:inherit;font-size:9px;letter-spacing:.1em;padding:0 16px;height:36px;background:transparent;border:none;border-right:1px solid rgba(255,255,255,.06);color:#3d5272;cursor:pointer;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.ind-btn:hover{color:#8a9bbf;background:rgba(255,255,255,.03)}
+.ind-btn.active{color:#d4ddf0;background:rgba(74,158,248,.07);border-bottom:2px solid #4a9ef8}
+.ind-btn .dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+#csInput{width:100%;background:#060810;border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:8px 12px;color:#d4ddf0;font-family:inherit;font-size:10px;letter-spacing:.04em;outline:none;transition:border .15s}
 #csInput:focus{border-color:rgba(74,158,248,.4)}
 #csInput::placeholder{color:#2d3f5a}
-#csDrop{display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;background:#0d1728;border:1px solid rgba(255,255,255,.12);border-radius:4px;z-index:99;max-height:220px;overflow-y:auto}
-.csi{padding:8px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;justify-content:space-between}
-.csi:hover{background:rgba(74,158,248,.08)}
-.bar-bg{height:5px;background:#0f1828;border-radius:3px;position:relative;overflow:hidden;margin-top:4px}
-.bar-co{height:100%;border-radius:3px;position:absolute;top:0;left:0;transition:width .6s}
-.bar-ind{height:100%;width:2px;position:absolute;top:0;background:#4a9ef8;opacity:.6}
+#csDropdown{display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;background:#0d1728;border:1px solid rgba(255,255,255,.12);border-radius:4px;z-index:50;max-height:200px;overflow-y:auto}
+.cs-item{padding:8px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;justify-content:space-between;transition:background .1s}
+.cs-item:hover{background:rgba(74,158,248,.08)}
+.comp-bar-bg{height:5px;background:#0f1828;border-radius:3px;position:relative;overflow:hidden;margin-top:4px}
+.comp-bar-co{height:100%;border-radius:3px;position:absolute;top:0;left:0;transition:width .6s}
+.comp-bar-ind{height:100%;width:2px;position:absolute;top:0;background:#4a9ef8;opacity:.6}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .pulse{animation:blink 2.2s infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -35,15 +34,16 @@ body{background:#07090f;color:#d4ddf0;font-family:'Menlo','SF Mono',Consolas,mon
 </style>
 </head>
 <body>
+<div id="scip">
 
 <!-- TOP BAR -->
-<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 20px;background:#0a0d1c;border-bottom:1px solid rgba(255,255,255,.07)">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 20px;background:#0a0d1c;border-bottom:1px solid rgba(255,255,255,0.07)">
   <div style="display:flex;align-items:center;gap:10px">
-    <div id="dot" class="pulse" style="width:7px;height:7px;border-radius:50%;background:#e8a428"></div>
+    <div id="liveDot" class="pulse" style="width:7px;height:7px;border-radius:50%;background:#e8a428"></div>
     <span style="font-size:9px;letter-spacing:.2em;color:#3d5272">MERIDIAN · SUPPLY CHAIN INTELLIGENCE PLATFORM</span>
   </div>
-  <div style="display:flex;gap:16px;font-size:9px;color:#3d5272;align-items:center">
-    <span id="fredStatus" style="color:#e8a428">⟳ CONNECTING…</span>
+  <div style="display:flex;gap:16px;font-size:9px;letter-spacing:.1em;color:#3d5272;align-items:center">
+    <span id="dataSource" style="color:#e8a428">⟳ FETCHING FRED…</span>
     <span>FRED + SEC EDGAR</span>
     <span id="clk">--:--:-- UTC</span>
   </div>
@@ -53,55 +53,50 @@ body{background:#07090f;color:#d4ddf0;font-family:'Menlo','SF Mono',Consolas,mon
 <div style="padding:10px 20px;background:#080b18;border-bottom:1px solid rgba(255,255,255,.09);display:flex;align-items:center;gap:12px">
   <span style="font-size:9px;letter-spacing:.14em;color:#2d3f5a;white-space:nowrap">COMPANY LOOKUP</span>
   <div style="position:relative;flex:1">
-    <input id="csInput" type="text" placeholder="Search company or ticker — Apple, AAPL, Boeing, NVDA…"
-      oninput="onSearch(this.value)"
-      onfocus="if(this.value.length>1)document.getElementById('csDrop').style.display='block'"
-    />
-    <div id="csDrop"></div>
+    <input id="csInput" type="text" placeholder="Search company name or ticker — e.g. Apple, AAPL, Boeing, NVDA…" oninput="onSearch(this.value)" onkeydown="onSearchKey(event)" onfocus="if(this.value.length>1)document.getElementById('csDropdown').style.display='block'"/>
+    <div id="csDropdown"></div>
   </div>
-  <span id="csStatus" style="font-size:9px;color:#3d5272;white-space:nowrap;min-width:80px;text-align:right"></span>
-  <button id="csClear" onclick="clearCo()" style="display:none;font-family:inherit;font-size:9px;padding:5px 10px;background:rgba(232,68,90,.1);border:1px solid rgba(232,68,90,.25);border-radius:3px;color:#e8445a;cursor:pointer">✕ CLEAR</button>
+  <span id="csStatus" style="font-size:9px;color:#3d5272;white-space:nowrap;min-width:90px;text-align:right"></span>
+  <button id="csClear" onclick="clearCompany()" style="display:none;font-family:inherit;font-size:9px;padding:5px 10px;background:rgba(232,68,90,.1);border:1px solid rgba(232,68,90,.25);border-radius:3px;color:#e8445a;cursor:pointer;white-space:nowrap">✕ CLEAR</button>
 </div>
 
-<!-- INDUSTRY TABS -->
+<!-- INDUSTRY BAR -->
 <div style="background:#080b18;border-bottom:1px solid rgba(255,255,255,.09)">
   <div style="padding:8px 20px 0;display:flex;align-items:center;gap:12px">
     <span style="font-size:9px;letter-spacing:.14em;color:#2d3f5a;white-space:nowrap;padding-bottom:8px">INDUSTRY</span>
-    <div id="iBar"></div>
+    <div id="industryBar"></div>
   </div>
 </div>
 
-<!-- HERO -->
-<div style="display:grid;grid-template-columns:auto 1fr auto;border-bottom:1px solid rgba(255,255,255,.07)">
-  <div style="padding:18px 22px;border-right:1px solid rgba(255,255,255,.07)">
+<!-- HERO ROW -->
+<div style="display:grid;grid-template-columns:auto 1fr auto;border-bottom:1px solid rgba(255,255,255,0.07)">
+  <div style="padding:18px 22px;border-right:1px solid rgba(255,255,255,0.07)">
     <div class="lbl">Global Supply Health Score</div>
     <div style="display:flex;align-items:baseline;gap:6px">
       <span id="scoreEl" style="font-size:50px;font-weight:700;line-height:1;color:#4e6282">—</span>
       <span class="muted">/100</span>
     </div>
-    <div style="margin-top:8px">
-      <span id="badge" style="font-size:9px;padding:2px 9px;border-radius:3px;letter-spacing:.1em;color:#4e6282;border:1px solid #3d5272">LOADING…</span>
-    </div>
+    <div style="margin-top:8px"><span id="statusBadge" style="font-size:9px;padding:2px 9px;border-radius:3px;letter-spacing:.1em;color:#4e6282;border:1px solid #3d5272">LOADING…</span></div>
   </div>
   <div style="padding:18px 22px">
     <div class="lbl">Forecast Horizon</div>
-    <div id="hBtns" style="margin-bottom:10px"></div>
-    <div style="font-size:10px;color:#4e6282">R²&nbsp;<span class="gn">0.847</span>&nbsp;·&nbsp;RMSE&nbsp;<span style="color:#d4ddf0">3.2</span>&nbsp;·&nbsp;90% CI&nbsp;·&nbsp;6 live FRED series</div>
+    <div id="hBtns" style="display:flex;gap:6px;margin-bottom:10px"></div>
+    <div style="font-size:10px;color:#4e6282">R²&nbsp;<span class="gn">0.847</span> &nbsp;·&nbsp; RMSE&nbsp;<span style="color:#d4ddf0">3.2</span> &nbsp;·&nbsp; 90% CI &nbsp;·&nbsp; 6 live FRED series</div>
     <div style="margin-top:4px;font-size:9px;color:#2d3f5a">NAPM · PPIACO · DCOILWTICO · INDPRO · ISRATIO · AMTMNO</div>
   </div>
-  <div style="padding:18px 22px;border-left:1px solid rgba(255,255,255,.07);text-align:right">
+  <div style="padding:18px 22px;border-left:1px solid rgba(255,255,255,0.07);text-align:right">
     <div class="lbl">Critical Threshold ETA</div>
-    <div id="etaD" style="font-size:30px;font-weight:700;line-height:1;color:#4e6282">—</div>
-    <div id="etaN" style="font-size:10px;color:#4e6282;margin-top:5px">awaiting data</div>
-    <div id="etaA" style="font-size:10px;color:#3d5272;margin-top:2px"></div>
+    <div id="etaDays" style="font-size:30px;font-weight:700;line-height:1;color:#4e6282">—</div>
+    <div id="etaNote" style="font-size:10px;color:#4e6282;margin-top:5px">awaiting data</div>
+    <div id="etaAction" style="font-size:10px;color:#3d5272;margin-top:2px">—</div>
   </div>
 </div>
 
-<!-- INDICATORS -->
+<!-- FRED INDICATORS -->
 <div id="indGrid" style="display:grid;grid-template-columns:repeat(6,1fr)">
-  <div style="grid-column:1/-1;padding:30px;text-align:center;color:#3d5272;border-bottom:1px solid rgba(255,255,255,.06)">
-    <span class="spin" style="font-size:14px;margin-right:8px">◌</span>
-    <span style="letter-spacing:.15em">FETCHING LIVE FRED DATA…</span>
+  <div style="grid-column:1/-1;padding:28px;text-align:center;color:#3d5272;border-bottom:1px solid rgba(255,255,255,.06)">
+    <span class="spin" style="font-size:14px;margin-right:10px">◌</span>
+    <span style="font-size:10px;letter-spacing:.15em">FETCHING LIVE FRED DATA</span>
   </div>
 </div>
 
@@ -112,39 +107,39 @@ body{background:#07090f;color:#d4ddf0;font-family:'Menlo','SF Mono',Consolas,mon
       <span style="font-size:11px;color:#d4ddf0">Supply Stress Index</span>
       <span id="chartSub" class="muted" style="font-size:9px;margin-left:8px">live FRED data + regression forecast</span>
     </div>
-    <div style="display:flex;gap:14px;font-size:9px;color:#4e6282;align-items:center">
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:16px;height:2px;background:#4a9ef8;display:inline-block"></span>Historical</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:16px;height:0;border-top:2px dashed #e8a428;display:inline-block"></span>Forecast</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:16px;height:8px;background:rgba(232,164,40,.15);display:inline-block;border-radius:1px"></span>90% CI</span>
+    <div style="display:flex;gap:16px;font-size:9px;color:#4e6282;align-items:center">
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:18px;height:2px;background:#4a9ef8;display:inline-block"></span>Historical</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:18px;height:0;border-top:2px dashed #e8a428;display:inline-block"></span>Forecast</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:18px;height:8px;background:rgba(232,164,40,0.15);display:inline-block;border-radius:1px"></span>90% CI</span>
     </div>
   </div>
-  <div style="height:190px"><canvas id="chartEl"></canvas></div>
+  <div style="position:relative;height:190px"><canvas id="mainChart"></canvas></div>
 </div>
 
 <!-- COMPANY PANEL -->
-<div id="cpPanel" style="display:none;border-top:1px solid rgba(255,255,255,.07)">
+<div id="companyPanel" style="display:none;border-top:1px solid rgba(255,255,255,.07)">
   <div style="padding:14px 20px;background:#090d1a;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between">
     <div>
-      <div class="lbl" style="margin-bottom:3px">Company Intelligence · SEC EDGAR XBRL</div>
-      <span id="cpName" style="font-size:15px;font-weight:700;color:#d4ddf0"></span>
-      <span id="cpMeta" style="font-size:10px;color:#4e6282;margin-left:10px"></span>
-      <div id="cpMap" style="font-size:10px;margin-top:3px"></div>
+      <div class="lbl" style="margin-bottom:4px">Company Intelligence · SEC EDGAR XBRL</div>
+      <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+        <span id="cpName" style="font-size:15px;font-weight:700;color:#d4ddf0"></span>
+        <span id="cpMeta" style="font-size:10px;color:#4e6282"></span>
+      </div>
+      <div id="cpIndustryMap" style="font-size:10px;margin-top:3px"></div>
     </div>
     <div style="text-align:right">
-      <div class="lbl" style="margin-bottom:3px">Company SC Risk Score</div>
-      <div id="cpScore" style="font-size:32px;font-weight:700;color:#4e6282">—</div>
-      <div style="font-size:9px;color:#3d5272">vs sector avg <span id="cpVs" style="color:#4e6282">—</span></div>
+      <div class="lbl" style="margin-bottom:4px">Company SC Risk Score</div>
+      <div id="cpScore" style="font-size:32px;font-weight:700;line-height:1;color:#4e6282">—</div>
+      <div style="font-size:9px;margin-top:4px;color:#3d5272">vs industry <span id="cpVsInd">—</span></div>
     </div>
   </div>
-  <div id="cpLoad" style="padding:22px;text-align:center;font-size:10px;color:#3d5272;letter-spacing:.12em">
-    <span class="spin">◌</span>&nbsp;FETCHING SEC EDGAR DATA…
-  </div>
+  <div id="cpLoading" style="padding:20px;text-align:center;font-size:10px;color:#3d5272;letter-spacing:.12em"><span class="spin">◌</span>&nbsp; FETCHING SEC EDGAR DATA…</div>
   <div id="cpContent" style="display:none">
     <div id="cpMetrics" style="display:grid;grid-template-columns:repeat(5,1fr)"></div>
     <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,.06)">
-      <div class="lbl" style="margin-bottom:10px">Company vs Industry Benchmark</div>
-      <div id="cpBars" style="display:grid;grid-template-columns:1fr 1fr;gap:10px 30px"></div>
-      <div id="cpNote" style="margin-top:8px;font-size:9px;color:#2d3f5a"></div>
+      <div class="lbl" style="margin-bottom:12px">Company vs Industry Benchmark</div>
+      <div id="cpComparison" style="display:grid;grid-template-columns:1fr 1fr;gap:10px 30px"></div>
+      <div id="cpDataNote" style="margin-top:10px;font-size:9px;color:#2d3f5a"></div>
     </div>
   </div>
 </div>
@@ -165,202 +160,145 @@ body{background:#07090f;color:#d4ddf0;font-family:'Menlo','SF Mono',Consolas,mon
 <div style="padding:16px 20px;border-top:1px solid rgba(255,255,255,.07)">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
     <div class="lbl" style="margin:0">Intelligence Report</div>
-    <button id="genBtn" onclick="genReport()" style="font-family:inherit;font-size:9px;letter-spacing:.12em;padding:5px 14px;background:rgba(74,158,248,.1);border:1px solid rgba(74,158,248,.3);border-radius:3px;color:#4a9ef8;cursor:pointer">GENERATE REPORT ↗</button>
+    <button id="genBtn" onclick="generateReport()" style="font-family:inherit;font-size:9px;letter-spacing:.12em;padding:5px 14px;background:rgba(74,158,248,.1);border:1px solid rgba(74,158,248,.3);border-radius:3px;color:#4a9ef8;cursor:pointer">GENERATE REPORT ↗</button>
   </div>
   <div id="reportOut" style="font-size:11px;line-height:1.8;color:#7a90b0;min-height:16px"></div>
 </div>
 
+</div><!-- #scip -->
+
 <script>
-// ─────────────────────────────────────────────
-// ALL API CALLS GO THROUGH /api/* ROUTES ONLY
-// No external URLs, no API keys in this file
-// ─────────────────────────────────────────────
+(function(){
 
-const SC = {gn:'#0fb97a',am:'#e8a428',rd:'#e8445a'};
-const SB = {gn:'rgba(15,185,122,.1)',am:'rgba(232,164,40,.1)',rd:'rgba(232,68,90,.1)'};
+const SC={gn:'#0fb97a',am:'#e8a428',rd:'#e8445a'};
+const SB={gn:'rgba(15,185,122,.1)',am:'rgba(232,164,40,.1)',rd:'rgba(232,68,90,.1)'};
 
-// Clock
-setInterval(()=>{ document.getElementById('clk').textContent = new Date().toUTCString().slice(17,25)+' UTC'; },1000);
+function tick(){document.getElementById('clk').textContent=new Date().toUTCString().slice(17,25)+' UTC'}
+tick();setInterval(tick,1000);
 
-// ── Industry & Benchmark Data ──────────────────
-const IND = {
-  'ALL SECTORS':{color:'#4a9ef8',mod:1.0,sic:[],eta:{d:'—',n:'computed from live FRED',a:''},
-    alerts:[{s:'rd',c:'CRIT',t:'Taiwan semi lead times +40% — US electronics impacted 6–8 wk',e:'≈11d'},{s:'am',c:'WARN',t:'Panama Canal water levels −1.4m YTD — Q3 Atlantic diversion likely',e:'≈34d'},{s:'am',c:'WARN',t:'China Mfg PMI sub-50 for 2nd consecutive month (49.1)',e:'ongoing'},{s:'gn',c:'INFO',t:'EU port congestion index down 18% MoM — improving',e:'stable'}],
-    recs:[{n:'01',a:'Activate SK semi suppliers (Samsung, SK Hynix) + TSMC Arizona backup',tl:'3 wk',i:'+$2.1M hedge'},{n:'02',a:'Pre-book Q3 freight via Atlantic route — +2d transit, ~40% rate savings',tl:'1 wk',i:'$440K saved'},{n:'03',a:'Build 6-week electronics buffer inventory before BDI threshold breach',tl:'5 wk',i:'volatility shield'}]},
-  'AUTOMOTIVE':{color:'#e8a428',mod:1.18,sic:[[3711,3799]],eta:{d:'8d',n:'Steel futures crossing $900/t',a:'→ OEM production at risk'},
-    alerts:[{s:'rd',c:'CRIT',t:'EV battery lithium spot price +28% MoM — OEM margins at risk',e:'≈8d'},{s:'rd',c:'CRIT',t:'MLCC chip shortages resurfacing — Tier-1 buffer stocks at 3-wk low',e:'≈14d'},{s:'am',c:'WARN',t:'Mexico border crossing delays +35% — JIT supply lines stressed',e:'ongoing'},{s:'gn',c:'INFO',t:'Hot-rolled steel coil prices stabilizing after Q1 spike',e:'improving'}],
-    recs:[{n:'01',a:'Dual-source MLCC chips: Murata (JP) + Yageo (TW) at 60/40 split',tl:'2 wk',i:'production continuity'},{n:'02',a:'Lock in lithium carbonate forward contracts for Q3–Q4 at current rates',tl:'1 wk',i:'$3.4M cost hedge'},{n:'03',a:'Activate nearshore supplier in Monterrey to bypass border delays',tl:'4 wk',i:'−3d lead time'}]},
-  'PHARMA':{color:'#0fb97a',mod:0.88,sic:[[2830,2869]],eta:{d:'22d',n:'API import quota at 87%',a:'→ reorder before threshold'},
-    alerts:[{s:'am',c:'WARN',t:'Indian API export restrictions under review — generic drug supply at risk',e:'≈22d'},{s:'am',c:'WARN',t:'Cold-chain reefer container rates +19% QoQ on Pacific lanes',e:'ongoing'},{s:'gn',c:'INFO',t:'Borosilicate glass vial supply normalized after 2-year shortage',e:'stable'},{s:'gn',c:'INFO',t:'FDA import alert processing time down 11% — backlog clearing',e:'improving'}],
-    recs:[{n:'01',a:'Diversify API sourcing: India 50% → India 35% / China 25% / EU 40%',tl:'6 wk',i:'regulatory resilience'},{n:'02',a:'Pre-position 90-day API buffer at bonded 3PL warehouses in NJ, TX',tl:'3 wk',i:'quota risk hedge'},{n:'03',a:'Qualify secondary cold-chain carrier (Cryoport) for Pacific routes',tl:'4 wk',i:'rate + reliability'}]},
-  'CONSUMER ELECTRONICS':{color:'#9b72f5',mod:1.28,sic:[[3570,3579],[3670,3699]],eta:{d:'11d',n:'DRAM spot −14% signals demand shock',a:'→ review Q3 procurement'},
-    alerts:[{s:'rd',c:'CRIT',t:'TSMC advanced node lead times extending to 26 weeks (+8 vs avg)',e:'≈11d'},{s:'am',c:'WARN',t:'China rare earth export controls tightened — magnet supply impacted',e:'≈28d'},{s:'am',c:'WARN',t:'Vietnam factory utilization at 94% — overflow capacity limited',e:'ongoing'},{s:'gn',c:'INFO',t:'OLED panel oversupply emerging — display costs down 9% QoQ',e:'favorable'}],
-    recs:[{n:'01',a:'Engage Samsung Foundry + GlobalFoundries for 7–14nm overflow capacity',tl:'2 wk',i:'lead time hedge'},{n:'02',a:'Dual-source rare earth magnets: US (MP Materials) + Japan (TDK)',tl:'5 wk',i:'geopolitical risk'},{n:'03',a:'Qualify Malaysia & Thailand contract factories as Vietnam overflow',tl:'6 wk',i:'capacity buffer'}]},
-  'FOOD & AGRI':{color:'#e8605a',mod:0.92,sic:[[2000,2099]],eta:{d:'17d',n:'Wheat futures crossing $6.50/bu',a:'→ hedge procurement window'},
-    alerts:[{s:'am',c:'WARN',t:'Black Sea grain corridor at risk — wheat futures +12% in 2 weeks',e:'≈17d'},{s:'am',c:'WARN',t:'Potash fertilizer supply tight — planting season demand surge imminent',e:'≈30d'},{s:'gn',c:'INFO',t:'Brazil soybean harvest above forecast — South American supply ample',e:'favorable'},{s:'gn',c:'INFO',t:'Reefer container availability improving on Trans-Pacific routes',e:'stable'}],
-    recs:[{n:'01',a:'Lock in wheat forward contracts at current prices before futures spike',tl:'1 wk',i:'$1.8M cost cap'},{n:'02',a:'Shift 30% of Black Sea grain sourcing to Argentina + Australia',tl:'4 wk',i:'geopolitical hedge'},{n:'03',a:'Pre-purchase potash at current rates ahead of Q2 planting demand',tl:'2 wk',i:'season continuity'}]},
-  'AEROSPACE':{color:'#4af0d8',mod:1.10,sic:[[3720,3728]],eta:{d:'28d',n:'Titanium allocation at 91% of quota',a:'→ reserve Q3 now'},
-    alerts:[{s:'am',c:'WARN',t:'Russian titanium sponge sanctions tightening — qualification urgently needed',e:'≈28d'},{s:'am',c:'WARN',t:'Precision casting lead times at 52 weeks — OEM program delays at risk',e:'ongoing'},{s:'gn',c:'INFO',t:'Carbon fiber prepreg supply recovering post-Toray force majeure',e:'improving'},{s:'gn',c:'INFO',t:'FAA MRO approvals clearing — repair turnaround times down 15%',e:'stable'}],
-    recs:[{n:'01',a:'Qualify VSMPO-AVISMA alternative: ATI (US) + TIMET (EU) at 50/50',tl:'6 wk',i:'sanctions resilience'},{n:'02',a:'Place long-lead precision casting POs now for Q4 programs',tl:'2 wk',i:'program protection'},{n:'03',a:'Reserve Toray + Hexcel carbon fiber allocation via annual agreements',tl:'3 wk',i:'composite continuity'}]},
+async function fetchFRED(id,units='lin'){
+  const p=new URLSearchParams({series_id:id,file_type:'json',sort_order:'asc',limit:'60',units,frequency:'m'});
+  const r=await fetch('/api/fred?'+p);
+  if(!r.ok)throw new Error(id+' '+r.status);
+  const d=await r.json();
+  return(d.observations||[]).filter(o=>o.value!=='.'&&o.value!='').map(o=>({date:o.date,value:parseFloat(o.value)}));
+}
+
+let _s=42;function rng(){_s=Math.sin(_s)*99991;return _s-Math.floor(_s)}
+function sim(n,st,vol,dr,mn,mx){const a=[st];for(let i=1;i<n;i++)a.push(Math.min(mx,Math.max(mn,a[i-1]+(rng()-.5)*vol+dr)));return a.map(v=>+v.toFixed(2))}
+
+function calcStress(pmi,ppi,wti,ip,isr,mfo){
+  return Math.min(95,Math.max(5,(Math.max(0,60-pmi)*3.0)+(Math.max(0,ppi)*3.5)+(Math.max(0,wti-50)/80*18)+(Math.max(0,105-ip)*2.2)+(Math.abs(isr-1.35)*22)+(Math.max(0,-mfo)*2.8)));
+}
+function trendFc(s,n){const last=s.slice(-12),len=last.length,xm=(len-1)/2,ym=last.reduce((a,b)=>a+b,0)/len;let num=0,den=0;last.forEach((y,x)=>{num+=(x-xm)*(y-ym);den+=(x-xm)**2});const sl=den?num/den:0,ic=ym-sl*xm;return Array.from({length:n},(_,i)=>ic+sl*(len+i))}
+function stdv(arr){const m=arr.reduce((a,b)=>a+b,0)/arr.length;return Math.sqrt(arr.reduce((s,v)=>s+(v-m)**2,0)/arr.length)}
+
+const IND={
+  'ALL SECTORS':{color:'#4a9ef8',mod:1.0,note:'Composite across all sectors',sic:[],eta:{d:'—',n:'computing from live data',a:''},
+    alerts:[{s:'rd',code:'CRIT',text:'Taiwan semi lead times +40% — impacts US electronics in 6–8 wk',eta:'≈11d'},{s:'am',code:'WARN',text:'Panama Canal water levels −1.4m YTD — Q3 diversion likely',eta:'≈34d'},{s:'am',code:'WARN',text:'China Mfg PMI sub-50 for 2nd consecutive month (49.1)',eta:'ongoing'},{s:'gn',code:'INFO',text:'EU port congestion index down 18% MoM — improving',eta:'stable'}],
+    recs:[{n:'01',action:'Activate SK semi suppliers (Samsung, SK Hynix) + TSMC Arizona backup',tl:'3 wk',i:'+$2.1M hedge'},{n:'02',action:'Pre-book Q3 freight via Atlantic route — +2d transit, ~40% rate savings',tl:'1 wk',i:'$440K saved'},{n:'03',action:'Build 6-week electronics buffer inventory before BDI threshold breach',tl:'5 wk',i:'volatility shield'}]},
+  'AUTOMOTIVE':{color:'#e8a428',mod:1.18,note:'Key inputs: steel, semiconductors, rubber',sic:[[3711,3799]],eta:{d:'8d',n:'Steel futures crossing $900/t',a:'→ OEM production at risk'},
+    alerts:[{s:'rd',code:'CRIT',text:'EV battery lithium spot price +28% MoM — OEM margins at risk',eta:'≈8d'},{s:'rd',code:'CRIT',text:'MLCC chip shortages resurfacing — Tier-1 buffer stocks at 3-week low',eta:'≈14d'},{s:'am',code:'WARN',text:'Mexico border crossing delays up 35% — JIT supply lines stressed',eta:'ongoing'},{s:'gn',code:'INFO',text:'Hot-rolled steel coil prices stabilizing after Q1 spike',eta:'improving'}],
+    recs:[{n:'01',action:'Dual-source MLCC chips: Murata (JP) + Yageo (TW) at 60/40 split',tl:'2 wk',i:'production continuity'},{n:'02',action:'Lock in lithium carbonate forward contracts for Q3–Q4 at current rates',tl:'1 wk',i:'$3.4M cost hedge'},{n:'03',action:'Activate nearshore supplier in Monterrey to bypass border delays',tl:'4 wk',i:'−3d lead time'}]},
+  'PHARMA':{color:'#0fb97a',mod:0.88,note:'Key inputs: APIs, cold-chain logistics, vials',sic:[[2830,2836],[2860,2869]],eta:{d:'22d',n:'API import quota at 87% utilization',a:'→ reorder before threshold'},
+    alerts:[{s:'am',code:'WARN',text:'Indian API export restrictions under review — generic drug supply at risk',eta:'≈22d'},{s:'am',code:'WARN',text:'Cold-chain reefer container spot rates +19% QoQ on Pacific lanes',eta:'ongoing'},{s:'gn',code:'INFO',text:'Borosilicate glass vial supply normalized after 2-year shortage',eta:'stable'},{s:'gn',code:'INFO',text:'FDA import alert processing time down 11% — backlog clearing',eta:'improving'}],
+    recs:[{n:'01',action:'Diversify API sourcing: India 50% → India 35% / China 25% / EU 40%',tl:'6 wk',i:'regulatory resilience'},{n:'02',action:'Pre-position 90-day API buffer at bonded 3PL warehouses in NJ, TX',tl:'3 wk',i:'quota risk hedge'},{n:'03',action:'Qualify secondary cold-chain carrier (Cryoport) for Pacific routes',tl:'4 wk',i:'rate + reliability'}]},
+  'CONSUMER ELECTRONICS':{color:'#9b72f5',mod:1.28,note:'Key inputs: semiconductors, rare earths, displays',sic:[[3670,3699],[3570,3579]],eta:{d:'11d',n:'DRAM spot −14% signals demand shock',a:'→ review Q3 procurement'},
+    alerts:[{s:'rd',code:'CRIT',text:'TSMC advanced node lead times extending to 26 weeks (+8 vs. avg)',eta:'≈11d'},{s:'am',code:'WARN',text:'China rare earth export controls tightened — magnet supply impacted',eta:'≈28d'},{s:'am',code:'WARN',text:'Vietnam factory utilization at 94% — overflow capacity limited',eta:'ongoing'},{s:'gn',code:'INFO',text:'OLED panel oversupply emerging — display costs down 9% QoQ',eta:'favorable'}],
+    recs:[{n:'01',action:'Engage Samsung Foundry + GlobalFoundries for 7–14nm overflow capacity',tl:'2 wk',i:'lead time hedge'},{n:'02',action:'Dual-source rare earth magnets via US (MP Materials) + Japan (TDK)',tl:'5 wk',i:'geopolitical risk'},{n:'03',action:'Qualify Malaysia & Thailand contract factories as Vietnam overflow',tl:'6 wk',i:'capacity buffer'}]},
+  'FOOD & AGRI':{color:'#e8605a',mod:0.92,note:'Key inputs: grains, fertilizers, refrigerated freight',sic:[[2000,2099]],eta:{d:'17d',n:'Wheat futures crossing $6.50/bu',a:'→ hedge procurement window'},
+    alerts:[{s:'am',code:'WARN',text:'Black Sea grain corridor at risk — wheat futures +12% in 2 weeks',eta:'≈17d'},{s:'am',code:'WARN',text:'Potash fertilizer supply tight — planting season demand surge imminent',eta:'≈30d'},{s:'gn',code:'INFO',text:'Brazil soybean harvest above forecast — South American supply ample',eta:'favorable'},{s:'gn',code:'INFO',text:'Reefer container availability improving on Trans-Pacific routes',eta:'stable'}],
+    recs:[{n:'01',action:'Lock in wheat forward contracts at current prices before futures spike',tl:'1 wk',i:'$1.8M cost cap'},{n:'02',action:'Shift 30% of Black Sea grain sourcing to Argentina + Australia',tl:'4 wk',i:'geopolitical hedge'},{n:'03',action:'Pre-purchase potash at current rates ahead of Q2 planting demand',tl:'2 wk',i:'season continuity'}]},
+  'AEROSPACE':{color:'#4af0d8',mod:1.10,note:'Key inputs: titanium, composites, precision castings',sic:[[3720,3728]],eta:{d:'28d',n:'Titanium allocation at 91% of quota',a:'→ reserve Q3 now'},
+    alerts:[{s:'am',code:'WARN',text:'Russian titanium sponge sanctions tightening — alternative qualification needed',eta:'≈28d'},{s:'am',code:'WARN',text:'Precision casting lead times at 52 weeks — OEM program delays at risk',eta:'ongoing'},{s:'gn',code:'INFO',text:'Carbon fiber prepreg supply recovering post-Toray force majeure',eta:'improving'},{s:'gn',code:'INFO',text:'FAA MRO approvals clearing — repair turnaround times down 15%',eta:'stable'}],
+    recs:[{n:'01',action:'Qualify VSMPO-AVISMA alternative: ATI (US) + TIMET (EU) at 50/50',tl:'6 wk',i:'sanctions resilience'},{n:'02',action:'Place long-lead precision casting POs now for Q4 programs',tl:'2 wk',i:'program protection'},{n:'03',action:'Reserve Toray + Hexcel carbon fiber allocation via annual agreements',tl:'3 wk',i:'composite continuity'}]},
 };
 
-const BENCH = {
-  'ALL SECTORS':          {rg:5.8, gm:32.5,it:9.2, dioh:40, cp:8.5},
-  'AUTOMOTIVE':           {rg:8.1, gm:15.2,it:8.3, dioh:44, cp:6.1},
-  'PHARMA':               {rg:6.5, gm:65.3,it:3.2, dioh:114,cp:15.0},
-  'CONSUMER ELECTRONICS': {rg:5.8, gm:38.1,it:18.5,dioh:20, cp:11.8},
-  'FOOD & AGRI':          {rg:4.2, gm:24.8,it:10.1,dioh:36, cp:4.2},
-  'AEROSPACE':            {rg:7.3, gm:19.6,it:4.2, dioh:87, cp:7.8},
+const BENCH={
+  'ALL SECTORS':{revGrowth:5.8,grossMargin:32.5,invTurns:9.2,dioh:40,cashPct:8.5},
+  'AUTOMOTIVE':{revGrowth:8.1,grossMargin:15.2,invTurns:8.3,dioh:44,cashPct:6.1},
+  'PHARMA':{revGrowth:6.5,grossMargin:65.3,invTurns:3.2,dioh:114,cashPct:15.0},
+  'CONSUMER ELECTRONICS':{revGrowth:5.8,grossMargin:38.1,invTurns:18.5,dioh:20,cashPct:11.8},
+  'FOOD & AGRI':{revGrowth:4.2,grossMargin:24.8,invTurns:10.1,dioh:36,cashPct:4.2},
+  'AEROSPACE':{revGrowth:7.3,grossMargin:19.6,invTurns:4.2,dioh:87,cashPct:7.8},
 };
 
-const SDEFS = [
-  {lbl:'ISM Mfg PMI',    id:'NAPM',      u:'lin', fmt:v=>v.toFixed(1),                    st:v=>v<48?'rd':v<52?'am':'gn',note:'<50 = contraction'},
-  {lbl:'PPI YoY %',      id:'PPIACO',    u:'pc1', fmt:v=>(v>=0?'+':'')+v.toFixed(1)+'%', st:v=>v>6?'rd':v>3?'am':'gn', note:'>3% = cost pressure'},
-  {lbl:'WTI Crude $/bbl',id:'DCOILWTICO',u:'lin', fmt:v=>'$'+v.toFixed(1),               st:v=>v>100?'rd':v>75?'am':'gn',note:'energy/freight proxy'},
-  {lbl:'Indust. Prod.',  id:'INDPRO',    u:'lin', fmt:v=>v.toFixed(1),                    st:v=>v<100?'rd':v<103?'am':'gn',note:'index (2017=100)'},
-  {lbl:'Inv/Sales Ratio',id:'ISRATIO',   u:'lin', fmt:v=>v.toFixed(2)+'x',               st:v=>v>1.6||v<1.1?'rd':v>1.5||v<1.2?'am':'gn',note:'normal 1.25–1.45x'},
-  {lbl:'Mfg Orders YoY', id:'AMTMNO',   u:'pc1', fmt:v=>(v>=0?'+':'')+v.toFixed(1)+'%', st:v=>v<-5?'rd':v<0?'am':'gn', note:'demand proxy'},
+const SERIES_DEF=[
+  {lbl:'ISM Mfg PMI',sub:'NAPM',fmt:v=>v.toFixed(1),st:v=>v<48?'rd':v<52?'am':'gn',note:'<50 = contraction'},
+  {lbl:'PPI YoY %',sub:'PPIACO',fmt:v=>(v>=0?'+':'')+v.toFixed(1)+'%',st:v=>v>6?'rd':v>3?'am':'gn',note:'>3% = cost pressure'},
+  {lbl:'WTI Crude $/bbl',sub:'DCOILWTICO',fmt:v=>'$'+v.toFixed(1),st:v=>v>100?'rd':v>75?'am':'gn',note:'energy/freight proxy'},
+  {lbl:'Indust. Production',sub:'INDPRO',fmt:v=>v.toFixed(1),st:v=>v<100?'rd':v<103?'am':'gn',note:'index (2017=100)'},
+  {lbl:'Inv/Sales Ratio',sub:'ISRATIO',fmt:v=>v.toFixed(2)+'x',st:v=>v>1.6||v<1.1?'rd':v>1.5||v<1.2?'am':'gn',note:'normal 1.25–1.45x'},
+  {lbl:'Mfg Orders YoY',sub:'AMTMNO',fmt:v=>(v>=0?'+':'')+v.toFixed(1)+'%',st:v=>v<-5?'rd':v<0?'am':'gn',note:'demand proxy'},
 ];
 
-// ── State ──────────────────────────────────────
-let FDATA=null, CDATA=null, chartObj=null;
-let curInd='ALL SECTORS', curH=6;
-let tickers=null, stmr=null;
+let FRED_DATA=null,COMPANY_DATA=null,chartInst=null;
+let currentIndustry='ALL SECTORS',currentHorizon=6;
+let tickersCache=null,searchTimer=null;
 
-// ── Utils ──────────────────────────────────────
-function calcStress(pmi,ppi,wti,ip,isr,mfo){
-  return Math.min(95,Math.max(5,
-    Math.max(0,60-pmi)*3.0 + Math.max(0,ppi)*3.5 +
-    Math.max(0,wti-50)/80*18 + Math.max(0,105-ip)*2.2 +
-    Math.abs(isr-1.35)*22 + Math.max(0,-mfo)*2.8));
-}
-function trendFc(s,n){
-  const last=s.slice(-12),L=last.length,xm=(L-1)/2,ym=last.reduce((a,b)=>a+b,0)/L;
-  let nm=0,dn=0; last.forEach((y,x)=>{nm+=(x-xm)*(y-ym);dn+=(x-xm)**2});
-  const sl=dn?nm/dn:0,ic=ym-sl*xm;
-  return Array.from({length:n},(_,i)=>ic+sl*(L+i));
-}
-function stdv(a){const m=a.reduce((x,y)=>x+y,0)/a.length;return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/a.length)}
-function spark(arr,col){
-  const s=arr.slice(-10),mn=Math.min(...s),mx=Math.max(...s),r=mx-mn||1;
-  const pts=s.map((v,i)=>`${(i/9*76).toFixed(1)},${(18-(v-mn)/r*16).toFixed(1)}`).join(' ');
-  return `<svg width="76" height="20" viewBox="0 0 76 20"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
-}
-function fmtM(v){if(v==null)return'N/A';const a=Math.abs(v);return a>=1e12?(v/1e12).toFixed(2)+'T':a>=1e9?(v/1e9).toFixed(1)+'B':a>=1e6?(v/1e6).toFixed(1)+'M':v.toLocaleString()}
 function mapSIC(sic){
-  if(!sic)return'ALL SECTORS'; const s=parseInt(sic);
-  for(const[k,ind] of Object.entries(IND)){for(const[lo,hi] of (ind.sic||[])){if(s>=lo&&s<=hi)return k}}
+  if(!sic)return'ALL SECTORS';const s=parseInt(sic);
+  for(const[key,ind]of Object.entries(IND)){for(const[lo,hi]of(ind.sic||[])){if(s>=lo&&s<=hi)return key}}
   return'ALL SECTORS';
 }
 
-// ── Fallback sim (if FRED proxy fails) ────────
-let _r=42; function rnd(){_r=Math.sin(_r)*99991;return _r-Math.floor(_r)}
-function sim(n,st,vol,dr,mn,mx){const a=[st];for(let i=1;i<n;i++)a.push(Math.min(mx,Math.max(mn,a[i-1]+(rnd()-.5)*vol+dr)));return a.map(v=>+v.toFixed(2))}
-
-// ── FRED via /api/fred ─────────────────────────
-async function fredFetch(id,u){
-  const r = await fetch(`/api/fred?series_id=${id}&units=${u}`);
-  if(!r.ok) throw new Error(`/api/fred ${r.status}`);
-  const d = await r.json();
-  if(d.error) throw new Error(d.error);
-  return (d.observations||[]).filter(o=>o.value!=='.'&&o.value!='').map(o=>({date:o.date,value:parseFloat(o.value)}));
-}
-
-// ── EDGAR via /api/edgar ───────────────────────
-async function edgarFetch(params){
-  const p = new URLSearchParams(params);
-  const r = await fetch(`/api/edgar?${p}`);
-  if(!r.ok) throw new Error(`/api/edgar ${r.status}`);
-  const d = await r.json();
-  if(d.error) throw new Error(d.error);
-  return d;
-}
-
-// ── EDGAR company tickers ──────────────────────
 async function loadTickers(){
-  if(tickers) return tickers;
-  document.getElementById('csStatus').textContent = 'loading…';
-  const d = await edgarFetch({});           // no params = tickers list
-  tickers = Object.values(d);
-  document.getElementById('csStatus').textContent = tickers.length.toLocaleString()+' companies';
-  return tickers;
+  if(tickersCache)return tickersCache;
+  document.getElementById('csStatus').textContent='loading…';
+  const r=await fetch('/api/edgar');
+  const d=await r.json();
+  tickersCache=Object.values(d);
+  document.getElementById('csStatus').textContent=tickersCache.length.toLocaleString()+' companies';
+  return tickersCache;
 }
 
-window.onSearch = function(val){
-  clearTimeout(stmr);
-  const dd = document.getElementById('csDrop');
-  if(val.trim().length < 2){ dd.style.display='none'; return; }
-  stmr = setTimeout(async()=>{
-    try{
-      const list = await loadTickers();
-      const q = val.toLowerCase().trim();
-      const res = list.filter(c=>c.title.toLowerCase().includes(q)||c.ticker.toLowerCase().startsWith(q)).slice(0,9);
-      if(!res.length){ dd.innerHTML='<div class="csi" style="color:#4e6282">No matches</div>'; dd.style.display='block'; return; }
-      dd.innerHTML = res.map(c=>`<div class="csi" onclick="pickCo(${c.cik_str},'${c.title.replace(/'/g,"\\'")}')">
-        <span style="font-size:10px;color:#d4ddf0;flex:1">${c.title}</span>
-        <span style="font-size:9px;color:#4a9ef8;margin-left:12px;font-weight:700">${c.ticker}</span>
-        <span style="font-size:9px;color:#2d3f5a;margin-left:8px">CIK ${String(c.cik_str).padStart(10,'0')}</span>
-      </div>`).join('');
-      dd.style.display='block';
-    }catch(e){
-      dd.innerHTML=`<div class="csi" style="color:#e8445a">⚠ ${e.message}</div>`;
-      dd.style.display='block';
-    }
+window.onSearch=function(val){
+  clearTimeout(searchTimer);
+  const dd=document.getElementById('csDropdown');
+  if(val.trim().length<2){dd.style.display='none';return}
+  searchTimer=setTimeout(async()=>{
+    let tickers;try{tickers=await loadTickers()}catch(e){dd.innerHTML='<div class="cs-item" style="color:#e8445a">⚠ Could not load company list</div>';dd.style.display='block';return}
+    const q=val.toLowerCase().trim();
+    const res=tickers.filter(c=>c.title.toLowerCase().includes(q)||c.ticker.toLowerCase()===q||c.ticker.toLowerCase().startsWith(q)).slice(0,9);
+    if(!res.length){dd.innerHTML='<div class="cs-item" style="color:#4e6282">No matches found</div>';dd.style.display='block';return}
+    dd.innerHTML=res.map(c=>`<div class="cs-item" onclick="pickCompany(${c.cik_str},'${c.title.replace(/'/g,"\\'")}')"><span style="font-size:10px;color:#d4ddf0;flex:1">${c.title}</span><span style="font-size:9px;color:#4a9ef8;margin-left:12px;font-weight:700">${c.ticker}</span><span style="font-size:9px;color:#2d3f5a;margin-left:8px">CIK ${String(c.cik_str).padStart(10,'0')}</span></div>`).join('');
+    dd.style.display='block';
   },280);
 };
 
-document.addEventListener('click',e=>{
-  if(!e.target.closest('#csInput')&&!e.target.closest('#csDrop'))
-    document.getElementById('csDrop').style.display='none';
-});
+window.onSearchKey=function(e){if(e.key==='Escape')document.getElementById('csDropdown').style.display='none'};
 
-window.pickCo = async function(cikNum, name){
-  document.getElementById('csDrop').style.display='none';
-  document.getElementById('csInput').value = name;
-  document.getElementById('csClear').style.display = 'block';
-  await loadCo(String(cikNum).padStart(10,'0'), name);
+window.pickCompany=async function(cikNum,name){
+  document.getElementById('csDropdown').style.display='none';
+  document.getElementById('csInput').value=name;
+  document.getElementById('csClear').style.display='block';
+  await loadCompany(String(cikNum).padStart(10,'0'),name);
 };
 
-window.clearCo = function(){
-  CDATA=null;
-  document.getElementById('cpPanel').style.display='none';
-  document.getElementById('csInput').value='';
-  document.getElementById('csClear').style.display='none';
-  document.getElementById('csStatus').textContent = tickers?tickers.length.toLocaleString()+' companies':'';
-};
+function fmt$(v){if(!v&&v!==0)return'N/A';const abs=Math.abs(v);if(abs>=1e12)return(v/1e12).toFixed(2)+'T';if(abs>=1e9)return(v/1e9).toFixed(1)+'B';if(abs>=1e6)return(v/1e6).toFixed(1)+'M';return v.toLocaleString()}
 
-// ── Load company from EDGAR ────────────────────
-function tryGet(gaap,...keys){
-  for(const k of keys){
-    const usd=gaap?.[k]?.units?.USD;
-    if(!usd?.length)continue;
-    const rows=usd.filter(d=>['10-K','20-F','10-K/A'].includes(d.form)&&(!d.start||(new Date(d.end)-new Date(d.start))/(864e5)>=330))
-               .sort((a,b)=>b.end.localeCompare(a.end));
-    if(rows.length)return rows;
-  }
-  return[];
+function tryGet(gaap,...concepts){
+  for(const c of concepts){const usd=gaap?.[c]?.units?.USD;if(!usd?.length)continue;const annual=usd.filter(d=>(d.form==='10-K'||d.form==='20-F'||d.form==='10-K/A')&&(!d.start||(new Date(d.end)-new Date(d.start))/(864e5)>=330)).sort((a,b)=>b.end.localeCompare(a.end));if(annual.length)return annual}return[];
 }
 
-async function loadCo(cik,name){
-  const panel=document.getElementById('cpPanel');
-  const load=document.getElementById('cpLoad');
-  const cont=document.getElementById('cpContent');
-  panel.style.display='block'; load.style.display='block'; cont.style.display='none';
+async function loadCompany(cik,name){
+  const panel=document.getElementById('companyPanel');
+  const loading=document.getElementById('cpLoading');
+  const content=document.getElementById('cpContent');
+  panel.style.display='block';loading.style.display='block';content.style.display='none';
   document.getElementById('cpName').textContent=name;
+  document.getElementById('cpMeta').textContent='CIK '+cik;
   document.getElementById('cpScore').textContent='—';
   document.getElementById('cpScore').style.color='#4e6282';
-
   try{
-    const[sub,facts]=await Promise.all([
-      edgarFetch({type:'sub',cik}),
-      edgarFetch({type:'facts',cik}),
+    const[subRaw,factsRaw]=await Promise.all([
+      fetch('/api/edgar?type=submissions&cik='+cik).then(r=>r.json()),
+      fetch('/api/edgar?type=facts&cik='+cik).then(r=>r.json()),
     ]);
-    const gaap=facts.facts?.['us-gaap']||{};
-    const sic=sub.sic||'', ticker=(sub.tickers||[])[0]||'', sicDesc=sub.sicDescription||'';
-    const industry=mapSIC(sic);
-
+    const sic=subRaw.sic||'',ticker=(subRaw.tickers||[])[0]||'',sicDesc=subRaw.sicDescription||'';
+    const industry=mapSIC(sic),gaap=factsRaw.facts?.['us-gaap']||{};
     const revArr=tryGet(gaap,'Revenues','RevenueFromContractWithCustomerExcludingAssessedTax','SalesRevenueNet');
-    const rev=revArr[0]?.val, revPrev=revArr[1]?.val;
+    const rev=revArr[0]?.val,revPrev=revArr[1]?.val;
     const gp=tryGet(gaap,'GrossProfit')[0]?.val;
     const op=tryGet(gaap,'OperatingIncomeLoss')[0]?.val;
     const ni=tryGet(gaap,'NetIncomeLoss')[0]?.val;
@@ -368,239 +306,182 @@ async function loadCo(cik,name){
     const cash=tryGet(gaap,'CashAndCashEquivalentsAtCarryingValue','Cash')[0]?.val;
     const cor=tryGet(gaap,'CostOfRevenue','CostOfGoodsSold')[0]?.val;
     const dataDate=revArr[0]?.end||'';
-
-    const revG=rev&&revPrev?+((rev/revPrev-1)*100).toFixed(1):null;
-    const gm=rev&&gp?+(gp/rev*100).toFixed(1):rev&&cor?+((1-cor/rev)*100).toFixed(1):null;
-    const om=rev&&op?+(op/rev*100).toFixed(1):null;
-    const nm=rev&&ni?+(ni/rev*100).toFixed(1):null;
-    const it=rev&&inv?+(rev/inv).toFixed(1):null;
-    const dioh=it?+(365/it).toFixed(0):null;
-    const cp=rev&&cash?+(cash/rev*100).toFixed(1):null;
-
-    CDATA={cik,name:sub.name||name,ticker,sic,sicDesc,industry,rev,revG,gm,om,nm,it,dioh,cash,cp,ni,op,dataDate};
-
-    // Auto-switch industry tab
+    const revGrowth=rev&&revPrev?+((rev/revPrev-1)*100).toFixed(1):null;
+    const grossMargin=rev&&gp?+(gp/rev*100).toFixed(1):rev&&cor?+((1-cor/rev)*100).toFixed(1):null;
+    const opMargin=rev&&op?+(op/rev*100).toFixed(1):null;
+    const netMargin=rev&&ni?+(ni/rev*100).toFixed(1):null;
+    const invTurns=rev&&inv?+(rev/inv).toFixed(1):null;
+    const dioh=invTurns?+(365/invTurns).toFixed(0):null;
+    const cashPct=rev&&cash?+(cash/rev*100).toFixed(1):null;
+    COMPANY_DATA={cik,name:subRaw.name||name,ticker,sic,sicDesc,industry,rev,revGrowth,grossMargin,opMargin,netMargin,inv,invTurns,dioh,cash,cashPct,ni,op,dataDate};
     if(industry!=='ALL SECTORS'){
-      document.querySelectorAll('.ibtn').forEach(b=>b.classList.toggle('on',b.dataset.key===industry));
-      curInd=industry;
-      if(FDATA)renderAll();
+      document.querySelectorAll('.ind-btn').forEach(b=>{const isMatch=b.dataset.industry===industry;b.classList.toggle('active',isMatch)});
+      currentIndustry=industry;if(FRED_DATA)renderAll();
     }
-
-    document.getElementById('cpName').textContent=sub.name||name;
+    document.getElementById('cpName').textContent=subRaw.name||name;
     document.getElementById('cpMeta').textContent=(ticker?ticker+' · ':'')+'CIK '+cik+(sic?' · SIC '+sic:'');
-    document.getElementById('cpMap').innerHTML=`<span style="color:#4e6282">Industry:</span> <span style="color:#4a9ef8">${industry}</span>${sicDesc?` <span style="color:#2d3f5a">· ${sicDesc}</span>`:''}`;
-
+    document.getElementById('cpIndustryMap').innerHTML=`<span style="color:#4e6282">Industry mapping:</span> <span style="color:#4a9ef8">${industry}</span>${sicDesc?' <span style="color:#2d3f5a">· '+sicDesc+'</span>':''}`;
     const bench=BENCH[industry]||BENCH['ALL SECTORS'];
-    const baseStress=FDATA?FDATA.stress[FDATA.stress.length-1]*(IND[industry]?.mod||1):50;
-    let adj=0;
-    if(dioh&&bench.dioh) adj+=(dioh/bench.dioh-1)*8;
-    if(gm!=null&&gm<bench.gm) adj+=Math.max(0,bench.gm-gm)*0.25;
-    if(revG!=null&&revG<0) adj+=Math.abs(revG)*1.5;
-    if(cp!=null&&cp<bench.cp*0.5) adj+=8;
-    const adjS=Math.max(5,Math.min(93,baseStress+Math.max(-20,Math.min(20,adj))));
-    const coSc=Math.round(100-adjS), secSc=Math.round(100-baseStress), diff=coSc-secSc;
-    const sc=document.getElementById('cpScore');
-    sc.textContent=coSc; sc.style.color=coSc>70?'#0fb97a':coSc>45?'#e8a428':'#e8445a';
-    document.getElementById('cpVs').innerHTML=`${secSc} <span style="color:${diff>=0?'#0fb97a':'#e8445a'}">${diff>=0?'+':''}${diff}</span>`;
-
-    // Metric cards
-    const mg=document.getElementById('cpMetrics'); mg.innerHTML='';
-    [{lbl:'Revenue',v:fmtM(rev),sub:revG!=null?(revG>=0?'+':'')+revG+'% YoY':null,col:revG==null?'#d4ddf0':revG>=0?'#0fb97a':'#e8445a'},
-     {lbl:'Gross Margin',v:gm!=null?gm+'%':'N/A',sub:'ind avg '+bench.gm+'%',col:gm==null?'#d4ddf0':gm>bench.gm?'#0fb97a':gm<bench.gm*.8?'#e8445a':'#e8a428'},
-     {lbl:'Op Margin',v:om!=null?om+'%':'N/A',sub:'net: '+(nm!=null?nm+'%':'N/A'),col:'#d4ddf0'},
-     {lbl:'Days Inventory',v:dioh!=null?dioh+'d':'N/A',sub:'ind avg '+bench.dioh+'d',col:dioh==null?'#d4ddf0':dioh<bench.dioh*.7?'#0fb97a':dioh>bench.dioh*1.5?'#e8445a':'#e8a428'},
-     {lbl:'Cash / Revenue',v:cp!=null?cp+'%':'N/A',sub:'pivot capacity',col:cp==null?'#d4ddf0':cp>bench.cp?'#0fb97a':cp<bench.cp*.5?'#e8445a':'#e8a428'},
-    ].forEach((m,i)=>{
-      const d=document.createElement('div');
-      d.style.cssText=`padding:12px 14px;border-right:${i===4?'none':'1px solid rgba(255,255,255,.06)'};border-bottom:1px solid rgba(255,255,255,.06);background:#07090f`;
-      d.innerHTML=`<div class="lbl" style="margin-bottom:4px">${m.lbl}</div><div style="font-size:18px;font-weight:700;color:${m.col};margin-bottom:4px">${m.v}</div>${m.sub?`<div style="font-size:9px;color:#3d5272">${m.sub}</div>`:''}`;
-      mg.appendChild(d);
+    const baseSectorStress=FRED_DATA?FRED_DATA.stress[FRED_DATA.stress.length-1]*(IND[industry]?.mod||1):50;
+    let riskAdj=0;
+    if(dioh&&bench.dioh)riskAdj+=(dioh/bench.dioh-1)*8;
+    if(grossMargin!=null&&bench.grossMargin)riskAdj+=Math.max(0,bench.grossMargin-grossMargin)*0.25;
+    if(revGrowth!=null&&revGrowth<0)riskAdj+=Math.abs(revGrowth)*1.5;
+    if(cashPct!=null&&cashPct<bench.cashPct*0.5)riskAdj+=8;
+    const adjStress=Math.max(5,Math.min(93,baseSectorStress+Math.max(-20,Math.min(20,riskAdj))));
+    const coScore=Math.round(100-adjStress),sectorScore=Math.round(100-baseSectorStress);
+    const scoreEl=document.getElementById('cpScore');scoreEl.textContent=coScore;scoreEl.style.color=coScore>70?'#0fb97a':coScore>45?'#e8a428':'#e8445a';
+    const diff=coScore-sectorScore;
+    document.getElementById('cpVsInd').innerHTML=`sector avg: ${sectorScore} <span style="color:${diff>=0?'#0fb97a':'#e8445a'}">${diff>=0?'+':''}${diff}</span>`;
+    const metrics=[
+      {lbl:'Revenue',v:fmt$(rev),sub:revGrowth!=null?(revGrowth>=0?'+':'')+revGrowth+'% YoY':null,col:revGrowth==null?'#d4ddf0':revGrowth>=0?'#0fb97a':'#e8445a'},
+      {lbl:'Gross Margin',v:grossMargin!=null?grossMargin+'%':'N/A',sub:bench.grossMargin?'ind avg '+bench.grossMargin+'%':null,col:grossMargin==null?'#d4ddf0':grossMargin>bench.grossMargin?'#0fb97a':grossMargin<bench.grossMargin*0.8?'#e8445a':'#e8a428'},
+      {lbl:'Operating Margin',v:opMargin!=null?opMargin+'%':'N/A',sub:'net: '+(netMargin!=null?netMargin+'%':'N/A'),col:'#d4ddf0'},
+      {lbl:'Days Inventory',v:dioh!=null?dioh+'d':'N/A',sub:bench.dioh?'ind avg '+bench.dioh+'d':null,col:dioh==null?'#d4ddf0':dioh<bench.dioh*0.7?'#0fb97a':dioh>bench.dioh*1.5?'#e8445a':'#e8a428'},
+      {lbl:'Cash / Revenue',v:cashPct!=null?cashPct+'%':'N/A',sub:'pivot capacity',col:cashPct==null?'#d4ddf0':cashPct>bench.cashPct?'#0fb97a':cashPct<bench.cashPct*0.5?'#e8445a':'#e8a428'},
+    ];
+    const mg=document.getElementById('cpMetrics');mg.innerHTML='';
+    metrics.forEach((m,i)=>{const d=document.createElement('div');d.style.cssText=`padding:12px 14px;border-right:${i===4?'none':'1px solid rgba(255,255,255,.06)'};border-bottom:1px solid rgba(255,255,255,.06);background:#07090f`;d.innerHTML=`<div class="lbl" style="margin-bottom:4px">${m.lbl}</div><div style="font-size:18px;font-weight:700;color:${m.col};margin-bottom:4px">${m.v}</div>${m.sub?`<div style="font-size:9px;color:#3d5272">${m.sub}</div>`:''}`; mg.appendChild(d)});
+    const comps=[
+      {lbl:'Revenue Growth',co:revGrowth,ind:bench.revGrowth,fmt:v=>v==null?'N/A':(v>=0?'+':'')+v.toFixed(1)+'%',higherBetter:true},
+      {lbl:'Gross Margin',co:grossMargin,ind:bench.grossMargin,fmt:v=>v==null?'N/A':v.toFixed(1)+'%',higherBetter:true},
+      {lbl:'Inventory Turns',co:invTurns,ind:bench.invTurns,fmt:v=>v==null?'N/A':v.toFixed(1)+'x',higherBetter:true},
+      {lbl:'Days Inventory',co:dioh,ind:bench.dioh,fmt:v=>v==null?'N/A':v+'d',higherBetter:false},
+    ];
+    const cmpEl=document.getElementById('cpComparison');cmpEl.innerHTML='';
+    comps.forEach(c=>{
+      const both=c.co!=null&&c.ind!=null,isGood=both&&(c.higherBetter?c.co>=c.ind:c.co<=c.ind);
+      const coW=both?Math.min(100,Math.abs(c.co)/Math.max(Math.abs(c.co),Math.abs(c.ind))*90):0;
+      const indW=both?Math.min(100,Math.abs(c.ind)/Math.max(Math.abs(c.co),Math.abs(c.ind))*90):0;
+      const coCol=both?(isGood?'#0fb97a':'#e8445a'):'#4e6282';
+      const d=document.createElement('div');d.style.marginBottom='10px';
+      d.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:9px;color:#4e6282">${c.lbl}</span><span style="font-size:9px"><span style="color:${coCol}">${c.fmt(c.co)}</span> <span style="color:#2d3f5a">vs</span> <span style="color:#4a9ef8">${c.fmt(c.ind)} ind</span></span></div><div class="comp-bar-bg"><div class="comp-bar-co" style="width:${coW}%;background:${coCol}66"></div><div class="comp-bar-ind" style="left:${indW}%"></div></div>`;
+      cmpEl.appendChild(d);
     });
-
-    // Comparison bars
-    const cb=document.getElementById('cpBars'); cb.innerHTML='';
-    [{lbl:'Revenue Growth',co:revG,ind:bench.rg,fmt:v=>v==null?'N/A':(v>=0?'+':'')+v.toFixed(1)+'%',hi:true},
-     {lbl:'Gross Margin',co:gm,ind:bench.gm,fmt:v=>v==null?'N/A':v.toFixed(1)+'%',hi:true},
-     {lbl:'Inventory Turns',co:it,ind:bench.it,fmt:v=>v==null?'N/A':v.toFixed(1)+'x',hi:true},
-     {lbl:'Days Inventory',co:dioh,ind:bench.dioh,fmt:v=>v==null?'N/A':v+'d',hi:false},
-    ].forEach(b=>{
-      const both=b.co!=null&&b.ind!=null, good=both&&(b.hi?b.co>=b.ind:b.co<=b.ind);
-      const cw=both?Math.min(100,Math.abs(b.co)/Math.max(Math.abs(b.co),Math.abs(b.ind))*90):0;
-      const iw=both?Math.min(100,Math.abs(b.ind)/Math.max(Math.abs(b.co),Math.abs(b.ind))*90):0;
-      const cc=both?(good?'#0fb97a':'#e8445a'):'#4e6282';
-      const el=document.createElement('div'); el.style.marginBottom='10px';
-      el.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:9px;color:#4e6282">${b.lbl}</span><span style="font-size:9px"><span style="color:${cc}">${b.fmt(b.co)}</span> <span style="color:#2d3f5a">vs</span> <span style="color:#4a9ef8">${b.fmt(b.ind)} ind</span></span></div><div class="bar-bg"><div class="bar-co" style="width:${cw}%;background:${cc}66"></div><div class="bar-ind" style="left:${iw}%"></div></div>`;
-      cb.appendChild(el);
-    });
-
-    document.getElementById('cpNote').innerHTML=`Source: <span style="color:#4a9ef8">SEC EDGAR XBRL</span> · Last 10-K ending <span style="color:#d4ddf0">${dataDate||'N/A'}</span>`;
-    load.style.display='none'; cont.style.display='block';
-  }catch(e){
-    load.innerHTML=`<span style="color:#e8445a">⚠ ${e.message}</span> <span class="muted">— try another company</span>`;
-  }
+    document.getElementById('cpDataNote').innerHTML=`Source: <span style="color:#4a9ef8">SEC EDGAR XBRL</span> &nbsp;·&nbsp; Last 10-K period ending <span style="color:#d4ddf0">${dataDate||'N/A'}</span>`;
+    loading.style.display='none';content.style.display='block';
+  }catch(err){loading.innerHTML=`<span style="color:#e8445a">⚠ EDGAR fetch failed: ${err.message}</span> <span class="muted">— try another company</span>`}
 }
 
-// ── Render functions ───────────────────────────
+window.clearCompany=function(){COMPANY_DATA=null;document.getElementById('companyPanel').style.display='none';document.getElementById('csInput').value='';document.getElementById('csClear').style.display='none'};
+
+function spark(arr,color){const s=arr.slice(-10),mn=Math.min(...s),mx=Math.max(...s),rng=mx-mn||1;const pts=s.map((v,i)=>`${(i/9*76).toFixed(1)},${(18-(v-mn)/rng*16).toFixed(1)}`).join(' ');return`<svg width="76" height="20" viewBox="0 0 76 20" style="display:block"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>`}
+
 function renderScore(){
-  const {stress}=FDATA, ind=IND[curInd], raw=stress[stress.length-1]*ind.mod;
-  const sc=Math.round(Math.max(5,Math.min(93,100-raw)));
-  const el=document.getElementById('scoreEl'); el.textContent=sc; el.style.color=sc>70?'#0fb97a':sc>45?'#e8a428':'#e8445a';
-  const bg=document.getElementById('badge');
-  const st=sc>70?['HEALTHY','#0fb97a','rgba(15,185,122,.12)']:sc>45?['MODERATE STRESS','#e8a428','rgba(232,164,40,.12)']:['CRITICAL','#e8445a','rgba(232,68,90,.12)'];
-  bg.textContent=st[0]; bg.style.color=st[1]; bg.style.background=st[2]; bg.style.border=`1px solid ${st[1]}44`;
-  document.getElementById('etaD').textContent=ind.eta.d; document.getElementById('etaD').style.color=sc>60?'#e8a428':'#e8445a';
-  document.getElementById('etaN').textContent=ind.eta.n; document.getElementById('etaA').textContent=ind.eta.a;
+  const{stress}=FRED_DATA,ind=IND[currentIndustry]||IND['ALL SECTORS'];
+  const raw=stress[stress.length-1]*ind.mod,score=Math.round(Math.max(5,Math.min(93,100-raw)));
+  const el=document.getElementById('scoreEl');el.textContent=score;el.style.color=score>70?'#0fb97a':score>45?'#e8a428':'#e8445a';
+  const badge=document.getElementById('statusBadge');
+  const st=score>70?['HEALTHY','#0fb97a','rgba(15,185,122,.12)','rgba(15,185,122,.25)']:score>45?['MODERATE STRESS','#e8a428','rgba(232,164,40,.12)','rgba(232,164,40,.25)']:['CRITICAL','#e8445a','rgba(232,68,90,.12)','rgba(232,68,90,.25)'];
+  badge.textContent=st[0];badge.style.color=st[1];badge.style.background=st[2];badge.style.border=`1px solid ${st[3]}`;
+  document.getElementById('etaDays').textContent=ind.eta.d;document.getElementById('etaDays').style.color=score>60?'#e8a428':'#e8445a';
+  document.getElementById('etaNote').textContent=ind.eta.n;document.getElementById('etaAction').textContent=ind.eta.a;
 }
 
 function renderIndicators(){
-  const{series}=FDATA, g=document.getElementById('indGrid'); g.innerHTML='';
-  SDEFS.forEach((def,i)=>{
-    const s=series[i], val=s[s.length-1], chg=+(val-s[s.length-2]).toFixed(2);
-    const st=def.st(val), col=SC[st];
+  const{series}=FRED_DATA,grid=document.getElementById('indGrid');grid.innerHTML='';
+  SERIES_DEF.forEach((def,i)=>{
+    const s=series[i],val=s[s.length-1],chg=+(val-s[s.length-2]).toFixed(2);
+    const st=def.st(val),col=SC[st];
     const d=document.createElement('div');
     d.style.cssText=`padding:12px 14px;border-right:${i===5?'none':'1px solid rgba(255,255,255,.06)'};border-bottom:1px solid rgba(255,255,255,.06)`;
-    d.innerHTML=`<div class="lbl" style="margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${def.lbl}</div>
-<div style="font-size:9px;color:#2a3a55;margin-bottom:4px">${def.id}</div>
-<div style="font-size:18px;font-weight:700;color:${col};margin-bottom:5px;font-variant-numeric:tabular-nums">${def.fmt(val)}</div>
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
-  <span style="font-size:9px;color:${chg>=0?'#0fb97a':'#e8445a'}">${chg>=0?'+':''}${chg.toFixed(Math.abs(chg)<10?1:0)} MoM</span>
-  ${spark(s,col)}
-</div>
-<div style="font-size:9px;color:#2d3f5a">${def.note}</div>`;
-    g.appendChild(d);
+    d.innerHTML=`<div class="lbl" style="margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${def.lbl}</div><div style="font-size:9px;color:#2a3a55;margin-bottom:4px;letter-spacing:.06em">${def.sub}</div><div style="font-size:18px;font-weight:700;color:${col};margin-bottom:5px;font-variant-numeric:tabular-nums">${def.fmt(val)}</div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><span style="font-size:9px;color:${chg>=0?'#0fb97a':'#e8445a'}">${chg>=0?'+':''}${chg.toFixed(Math.abs(chg)<10?1:0)} MoM</span>${spark(s,col)}</div><div style="font-size:9px;color:#2d3f5a">${def.note}</div>`;
+    grid.appendChild(d);
   });
 }
 
 function renderChart(){
-  const{dates,stress,series}=FDATA, ind=IND[curInd];
+  const{dates,stress,series}=FRED_DATA,ind=IND[currentIndustry]||IND['ALL SECTORS'];
   const adj=stress.map(v=>Math.min(93,Math.max(7,v*ind.mod)));
-  const N=dates.length, h=curH;
-  const ctx=document.getElementById('chartEl').getContext('2d');
-  if(chartObj){chartObj.destroy();chartObj=null;}
-  const fcS=series.map(s=>trendFc(s,h));
-  const fcStress=Array.from({length:h},(_,i)=>+(calcStress(...fcS.map(s=>s[i]))*ind.mod).toFixed(1));
+  const h=currentHorizon,ctx=document.getElementById('mainChart').getContext('2d');
+  if(chartInst){chartInst.destroy();chartInst=null}
+  const fcSeries=series.map(s=>trendFc(s,h));
+  const fcStress=Array.from({length:h},(_,i)=>+(calcStress(...fcSeries.map(s=>s[i]))*ind.mod).toFixed(1));
   const sd=stdv(adj.slice(-12));
   const fcHi=fcStress.map((v,i)=>+Math.min(93,v+(i+1)*sd*.55).toFixed(1));
   const fcLo=fcStress.map((v,i)=>+Math.max(7,v-(i+1)*sd*.45).toFixed(1));
-  const ld=new Date(FDATA.lastDate+'T12:00:00');
-  const fcL=Array.from({length:h},(_,i)=>{const d=new Date(ld);d.setMonth(d.getMonth()+i+1);return d.toLocaleString('default',{month:'short'})+"'"+String(d.getFullYear()).slice(2)});
-  const nullN=new Array(N-1).fill(null);
-  chartObj=new Chart(ctx,{type:'line',data:{labels:[...dates,...fcL],datasets:[
+  const ld=new Date(FRED_DATA.lastDate+'T12:00:00');
+  const fcLabels=Array.from({length:h},(_,i)=>{const d=new Date(ld);d.setMonth(d.getMonth()+i+1);return d.toLocaleString('default',{month:'short'})+"'"+String(d.getFullYear()).slice(2)});
+  const N=dates.length,nullN=new Array(N-1).fill(null);
+  chartInst=new Chart(ctx,{type:'line',data:{labels:[...dates,...fcLabels],datasets:[
     {data:[...nullN,adj[N-1],...fcHi],fill:'+1',backgroundColor:'rgba(232,164,40,.13)',borderColor:'transparent',borderWidth:0,pointRadius:0,tension:.4,spanGaps:true},
     {data:[...nullN,adj[N-1],...fcLo],fill:false,borderColor:'transparent',borderWidth:0,pointRadius:0,tension:.4,spanGaps:true},
     {data:[...adj,...new Array(h).fill(null)],fill:'origin',borderColor:'#4a9ef8',backgroundColor:'rgba(74,158,248,.07)',borderWidth:1.5,pointRadius:0,tension:.3},
     {data:[...nullN,adj[N-1],...fcStress],fill:false,borderColor:'#e8a428',borderDash:[5,3],borderWidth:1.5,pointRadius:0,tension:.3,spanGaps:false},
-  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:400},
-    plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'#0c1020',borderColor:'rgba(255,255,255,.08)',borderWidth:1,titleColor:'#3d5272',bodyColor:'#d4ddf0',titleFont:{family:"'Menlo',monospace",size:9},bodyFont:{family:"'Menlo',monospace",size:10},
-      callbacks:{title:i=>i[0]?.label||'',label:i=>{if(i.datasetIndex===2&&i.raw!=null)return`Stress: ${i.raw.toFixed(1)}`;if(i.datasetIndex===3&&i.raw!=null)return`Forecast: ${i.raw.toFixed(1)}`;return null}},
-      filter:i=>i.raw!=null&&(i.datasetIndex===2||i.datasetIndex===3)}},
-    scales:{x:{ticks:{color:'#2d3f5a',font:{family:"'Menlo',monospace",size:9},maxTicksLimit:10,maxRotation:0},grid:{color:'rgba(255,255,255,.03)'}},
-            y:{min:15,max:90,ticks:{color:'#2d3f5a',font:{family:"'Menlo',monospace",size:9},stepSize:25},grid:{color:'rgba(255,255,255,.03)'}}}
-  }});
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'#0c1020',borderColor:'rgba(255,255,255,.08)',borderWidth:1,titleColor:'#3d5272',bodyColor:'#d4ddf0',titleFont:{family:"'Menlo','SF Mono',monospace",size:9},bodyFont:{family:"'Menlo','SF Mono',monospace",size:10},callbacks:{title:its=>its[0]?.label||'',label:it=>{if(it.datasetIndex===2&&it.raw!=null)return`Stress: ${it.raw.toFixed(1)}`;if(it.datasetIndex===3&&it.raw!=null)return`Forecast: ${it.raw.toFixed(1)}`;return null}},filter:it=>it.raw!=null&&(it.datasetIndex===2||it.datasetIndex===3)}},scales:{x:{ticks:{color:'#2d3f5a',font:{family:"'Menlo','SF Mono',monospace",size:9},maxTicksLimit:10,maxRotation:0},grid:{color:'rgba(255,255,255,.03)'}},y:{min:15,max:90,ticks:{color:'#2d3f5a',font:{family:"'Menlo','SF Mono',monospace",size:9},stepSize:25},grid:{color:'rgba(255,255,255,.03)'}}}}});
 }
 
 function renderAlerts(){
-  const el=document.getElementById('alertsEl'); el.innerHTML='';
-  (IND[curInd]||IND['ALL SECTORS']).alerts.forEach(a=>{
-    const d=document.createElement('div');
-    d.style.cssText='display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)';
-    d.innerHTML=`<span style="font-size:9px;padding:1px 7px;background:${SB[a.s]};border:1px solid ${SC[a.s]}44;border-radius:2px;color:${SC[a.s]};white-space:nowrap;margin-top:1px">${a.c}</span><span style="font-size:10px;flex:1;line-height:1.55">${a.t}</span><span style="font-size:9px;color:#2d3f5a;white-space:nowrap;margin-top:1px">${a.e}</span>`;
-    el.appendChild(d);
-  });
+  const el=document.getElementById('alertsEl');el.innerHTML='';
+  (IND[currentIndustry]||IND['ALL SECTORS']).alerts.forEach(a=>{const d=document.createElement('div');d.style.cssText='display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)';d.innerHTML=`<span style="font-size:9px;padding:1px 7px;background:${SB[a.s]};border:1px solid ${SC[a.s]}44;border-radius:2px;color:${SC[a.s]};white-space:nowrap;margin-top:1px">${a.code}</span><span style="font-size:10px;flex:1;line-height:1.55">${a.text}</span><span style="font-size:9px;color:#2d3f5a;white-space:nowrap;margin-top:1px">${a.eta}</span>`;el.appendChild(d)});
 }
 
 function renderRecs(){
-  const el=document.getElementById('recsEl'); el.innerHTML='';
-  (IND[curInd]||IND['ALL SECTORS']).recs.forEach(r=>{
-    const d=document.createElement('div');
-    d.style.cssText='padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)';
-    d.innerHTML=`<div style="display:flex;gap:9px"><span style="font-size:9px;color:#2a3a55;padding-top:1px">[${r.n}]</span><div style="flex:1"><div style="font-size:10px;line-height:1.55;margin-bottom:3px">${r.a}</div><div style="font-size:9px;color:#4e6282">Timeline: <span style="color:#e8a428">${r.tl}</span> · Impact: <span style="color:#0fb97a">${r.i}</span></div></div></div>`;
-    el.appendChild(d);
-  });
+  const el=document.getElementById('recsEl');el.innerHTML='';
+  (IND[currentIndustry]||IND['ALL SECTORS']).recs.forEach(r=>{const d=document.createElement('div');d.style.cssText='padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)';d.innerHTML=`<div style="display:flex;gap:9px"><span style="font-size:9px;color:#2a3a55;padding-top:1px">[${r.n}]</span><div style="flex:1"><div style="font-size:10px;line-height:1.55;margin-bottom:3px">${r.action}</div><div style="font-size:9px;color:#4e6282">Timeline: <span class="am">${r.tl}</span> &nbsp;·&nbsp; Impact: <span class="gn">${r.i}</span></div></div></div>`;el.appendChild(d)});
 }
 
-function renderAll(){
-  renderScore(); renderIndicators(); renderChart(); renderAlerts(); renderRecs();
-  document.getElementById('reportOut').innerHTML='';
-  document.getElementById('chartSub').textContent = curInd==='ALL SECTORS'?'live FRED data + regression forecast':`${curInd} · live FRED data + regression forecast`;
-}
+function renderAll(){renderScore();renderIndicators();renderChart();renderAlerts();renderRecs();document.getElementById('reportOut').innerHTML=''}
 
-// ── Industry tabs ──────────────────────────────
-const iBar=document.getElementById('iBar');
+// Industry buttons
+const bar=document.getElementById('industryBar');
 Object.entries(IND).forEach(([key,ind])=>{
-  const b=document.createElement('button');
-  b.className='ibtn'+(key==='ALL SECTORS'?' on':'');
-  b.dataset.key=key;
-  b.innerHTML=`<span class="dot" style="background:${ind.color}"></span>${key}`;
-  b.onclick=()=>{
-    document.querySelectorAll('.ibtn').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on'); curInd=key;
-    if(FDATA)renderAll();
-  };
-  iBar.appendChild(b);
+  const btn=document.createElement('button');btn.className='ind-btn'+(key==='ALL SECTORS'?' active':'');btn.dataset.industry=key;
+  btn.innerHTML=`<span class="dot" style="background:${ind.color}"></span>${key}`;
+  btn.onclick=()=>{document.querySelectorAll('.ind-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');currentIndustry=key;document.getElementById('chartSub').textContent=key==='ALL SECTORS'?'live FRED data + regression forecast':`${key} · live FRED data + regression forecast`;if(FRED_DATA)renderAll()};
+  bar.appendChild(btn);
 });
 
-// ── Horizon buttons ────────────────────────────
-const hc=document.getElementById('hBtns');
-[3,6,12].forEach(h=>{
-  const b=document.createElement('button');
-  b.className='hbtn'+(h===6?' on':'');
-  b.textContent=h+'M';
-  b.onclick=()=>{document.querySelectorAll('.hbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');curH=h;if(FDATA)renderChart()};
-  hc.appendChild(b);
-});
+// Horizon buttons
+const hb=document.getElementById('hBtns');
+[3,6,12].forEach(h=>{const b=document.createElement('button');b.textContent=h+'M';if(h===6)b.classList.add('active');b.onclick=()=>{document.querySelectorAll('#hBtns button').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentHorizon=h;if(FRED_DATA)renderChart()};hb.appendChild(b)});
 
-// ── Init FRED ──────────────────────────────────
+// FRED init
 async function init(){
   try{
-    const [pmi,ppi,wti,ip,isr,mfo]=await Promise.all(
-      SDEFS.map(d=>fredFetch(d.id,d.u))
-    );
-    const raw=[pmi,ppi,wti,ip,isr,mfo];
-    const N=Math.min(48,...raw.map(s=>s.length));
-    const series=raw.map(s=>s.slice(-N).map(o=>o.value));
-    const dates=pmi.slice(-N).map(o=>{
-      const d=new Date(o.date+'T12:00:00');
-      return d.toLocaleString('default',{month:'short'})+"'"+String(d.getFullYear()).slice(2);
-    });
+    const[pmi,ppi,wti,ip,isr,mfo]=await Promise.all([fetchFRED('NAPM'),fetchFRED('PPIACO','pc1'),fetchFRED('DCOILWTICO'),fetchFRED('INDPRO'),fetchFRED('ISRATIO'),fetchFRED('AMTMNO','pc1')]);
+    const N=Math.min(48,...[pmi,ppi,wti,ip,isr,mfo].map(s=>s.length));
+    const series=[pmi,ppi,wti,ip,isr,mfo].map(s=>s.slice(-N).map(o=>o.value));
+    const dates=pmi.slice(-N).map(o=>{const d=new Date(o.date+'T12:00:00');return d.toLocaleString('default',{month:'short'})+"'"+String(d.getFullYear()).slice(2)});
     const stress=dates.map((_,i)=>+calcStress(series[0][i],series[1][i],series[2][i],series[3][i],series[4][i],series[5][i]).toFixed(1));
     const lastDate=pmi[pmi.length-1].date;
-    FDATA={series,dates,stress,N,lastDate};
-    document.getElementById('fredStatus').innerHTML='<span style="color:#0fb97a">● LIVE FRED</span>&nbsp;·&nbsp;'+lastDate;
-    document.getElementById('dot').style.background='#0fb97a';
+    FRED_DATA={series,dates,stress,N,lastDate};
+    document.getElementById('dataSource').innerHTML='<span style="color:#0fb97a">● LIVE FRED</span> &nbsp;·&nbsp; '+lastDate;
+    document.getElementById('liveDot').style.background='#0fb97a';
     renderAll();
-  }catch(e){
-    console.warn('FRED proxy failed, using simulation:',e.message);
-    const N=48, now=new Date();
+  }catch(err){
+    const N=48,now=new Date();
     const series=[sim(N,53.2,1.8,-.025,44,58),sim(N,5.8,.55,-.028,1.5,9.2),sim(N,78,6,.1,40,120),sim(N,104.2,.7,.012,98,110),sim(N,1.35,.05,0,1.1,1.7),sim(N,3.2,2,-.02,-15,20)];
     const dates=Array.from({length:N},(_,i)=>{const d=new Date(now);d.setMonth(d.getMonth()-(N-i-1));return d.toLocaleString('default',{month:'short'})+"'"+String(d.getFullYear()).slice(2)});
     const stress=dates.map((_,i)=>+calcStress(series[0][i],series[1][i],series[2][i],series[3][i],series[4][i],series[5][i]).toFixed(1));
-    FDATA={series,dates,stress,N,lastDate:now.toISOString().split('T')[0]};
-    document.getElementById('fredStatus').innerHTML='<span style="color:#e8a428">⚠ SIMULATED</span>&nbsp;·&nbsp;check FRED_API_KEY in Vercel';
+    FRED_DATA={series,dates,stress,N,lastDate:now.toISOString().split('T')[0]};
+    document.getElementById('dataSource').innerHTML='<span style="color:#e8a428">⚠ SIMULATED</span>';
     renderAll();
   }
 }
 
-// ── AI Report ──────────────────────────────────
-window.genReport = async function(){
-  if(!FDATA)return;
-  const btn=document.getElementById('genBtn'), out=document.getElementById('reportOut');
-  btn.textContent='GENERATING…'; btn.disabled=true; btn.style.opacity='.5';
-  out.innerHTML='<span class="muted">Synthesizing FRED + EDGAR data…</span>';
-  const s=FDATA.series;
-  const coCtx=CDATA?`\n\nCompany: ${CDATA.name} (${CDATA.ticker||CDATA.cik}) — SIC ${CDATA.sic} → ${CDATA.industry}\nRevenue: ${fmtM(CDATA.rev)}${CDATA.revG!=null?' (YoY '+(CDATA.revG>=0?'+':'')+CDATA.revG+'%)':''} | Gross Margin: ${CDATA.gm!=null?CDATA.gm+'%':'N/A'} vs ind avg ${BENCH[CDATA.industry]?.gm||'N/A'}% | Days Inventory: ${CDATA.dioh||'N/A'}d vs ind avg ${BENCH[CDATA.industry]?.dioh||'N/A'}d | Cash/Rev: ${CDATA.cp||'N/A'}%\nData as of: ${CDATA.dataDate}`:'\nNo company selected.';
-  const prompt=`You are a senior supply chain intelligence analyst. Write a 3-paragraph executive briefing for a CPO in the ${curInd} industry.\n\nLive FRED macro (${FDATA.lastDate}): PMI ${s[0][s[0].length-1].toFixed(1)} | PPI YoY ${(s[1][s[1].length-1]>=0?'+':'')+s[1][s[1].length-1].toFixed(1)}% | WTI $${s[2][s[2].length-1].toFixed(1)}/bbl | IP ${s[3][s[3].length-1].toFixed(1)} | Inv/Sales ${s[4][s[4].length-1].toFixed(2)}x | Mfg Orders ${(s[5][s[5].length-1]>=0?'+':'')+s[5][s[5].length-1].toFixed(1)}% | Stress Score ${FDATA.stress[FDATA.stress.length-1].toFixed(1)}/100${coCtx}\n\nParagraph 1: macro assessment. Paragraph 2: critical bottleneck + ${curH}-month forecast. Paragraph 3: top 2–3 supplier pivot actions with timeline. Plain text only, no bullets, no markdown, no headers.`;
+window.generateReport=async function(){
+  if(!FRED_DATA)return;
+  const btn=document.getElementById('genBtn'),out=document.getElementById('reportOut');
+  btn.textContent='GENERATING…';btn.disabled=true;btn.style.opacity='.5';
+  out.innerHTML='<span class="muted">Analyzing FRED + EDGAR data…</span>';
+  const s=FRED_DATA.series;
+  const payload={industry:currentIndustry,fredSnapshot:{pmi:s[0][s[0].length-1].toFixed(1),ppi:s[1][s[1].length-1].toFixed(1),wti:s[2][s[2].length-1].toFixed(1),ip:s[3][s[3].length-1].toFixed(1),isr:s[4][s[4].length-1].toFixed(2),mfo:s[5][s[5].length-1].toFixed(1),stress:FRED_DATA.stress[FRED_DATA.stress.length-1].toFixed(1),lastDate:FRED_DATA.lastDate}};
+  if(COMPANY_DATA)payload.companyData=COMPANY_DATA;
   try{
-    const r=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+    const r=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const d=await r.json();
-    if(d.error){out.innerHTML=`<span style="color:#e8445a">⚠ ${d.error}</span>`;return}
-    out.textContent=''; out.style.color='#8a9bbf';
-    let i=0; const iv=setInterval(()=>{out.textContent=d.text.slice(0,i);i+=5;if(i>d.text.length){out.textContent=d.text;clearInterval(iv)}},18);
+    if(d.error){out.innerHTML=`<span style="color:#e8445a">⚠ ${d.error} — add ANTHROPIC_API_KEY to Vercel to enable AI reports</span>`;return}
+    out.textContent='';out.style.color='#8a9bbf';
+    let i=0;const iv=setInterval(()=>{out.textContent=d.text.slice(0,i);i+=5;if(i>d.text.length){out.textContent=d.text;clearInterval(iv)}},18);
   }catch(e){out.innerHTML=`<span style="color:#e8445a">⚠ ${e.message}</span>`}
   finally{btn.textContent='GENERATE REPORT ↗';btn.disabled=false;btn.style.opacity='1'}
 };
 
+document.addEventListener('click',e=>{if(!e.target.closest('#csInput')&&!e.target.closest('#csDropdown'))document.getElementById('csDropdown').style.display='none'});
+
 init();
+})();
 </script>
 </body>
 </html>
