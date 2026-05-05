@@ -2,38 +2,34 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const seriesId = searchParams.get('series_id');
-  const units    = searchParams.get('units') || 'lin';
+  const series_id = searchParams.get('series_id');
+  const units = searchParams.get('units') || 'lin';
 
-  if (!seriesId) {
+  if (!series_id) {
     return NextResponse.json({ error: 'Missing series_id' }, { status: 400 });
   }
 
-  const FRED_KEY = process.env.FRED_API_KEY;
-  if (!FRED_KEY) {
-    return NextResponse.json({ error: 'FRED_API_KEY not configured' }, { status: 500 });
+  const key = process.env.FRED_API_KEY;
+  if (!key) {
+    return NextResponse.json({ error: 'FRED_API_KEY not configured in environment' }, { status: 500 });
   }
 
-  const params = new URLSearchParams({
-    series_id:  seriesId,
-    api_key:    FRED_KEY,
-    file_type:  'json',
-    sort_order: 'asc',
-    limit:      '60',
-    units,
-    frequency:  'm',
-  });
+  const url = new URL('https://api.stlouisfed.org/fred/series/observations');
+  url.searchParams.set('series_id', series_id);
+  url.searchParams.set('api_key', key);
+  url.searchParams.set('file_type', 'json');
+  url.searchParams.set('sort_order', 'asc');
+  url.searchParams.set('limit', '60');
+  url.searchParams.set('units', units);
+  url.searchParams.set('frequency', 'm');
 
   try {
-    const upstream = await fetch(
-      `https://api.stlouisfed.org/fred/series/observations?${params}`,
-      { next: { revalidate: 3600 } } // cache 1 hour
-    );
-    if (!upstream.ok) throw new Error(`FRED ${upstream.status}`);
-    const data = await upstream.json();
+    const res = await fetch(url.toString(), { next: { revalidate: 3600 } });
+    if (!res.ok) throw new Error(`FRED API returned ${res.status}`);
+    const data = await res.json();
     return NextResponse.json(data);
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'Unknown error';
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
     return NextResponse.json({ error: msg }, { status: 502 });
   }
 }
