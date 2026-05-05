@@ -259,7 +259,7 @@ function sim(n,st,vol,dr,mn,mx){const a=[st];for(let i=1;i<n;i++)a.push(Math.min
 
 // ── FRED direct (CORS supported) ───────────────
 async function fredFetch(id,u){
-  const FRED_KEY='293746446a82b065a8d8a9b3b45d40a0';
+  const FRED_KEY='9f3bfdcef1c1b51971f4add8f00a2942';
   const p=new URLSearchParams({series_id:id,api_key:FRED_KEY,file_type:'json',sort_order:'asc',limit:'60',units:u,frequency:'m'});
   const r = await fetch('https://api.stlouisfed.org/fred/series/observations?'+p);
   if(!r.ok) throw new Error(`FRED ${r.status}`);
