@@ -169,7 +169,7 @@ html,body{background:#07090f;color:#d4ddf0;font-family:'Menlo','SF Mono','Consol
 
 <script>
 (function(){
-const FRED_KEY='293746446a82b065a8d8a9b3b45d40a0';
+
 const SC={gn:'#0fb97a',am:'#e8a428',rd:'#e8445a'};
 const SB={gn:'rgba(15,185,122,.1)',am:'rgba(232,164,40,.1)',rd:'rgba(232,68,90,.1)'};
 
@@ -177,8 +177,8 @@ function tick(){document.getElementById('clk').textContent=new Date().toUTCStrin
 tick();setInterval(tick,1000);
 
 async function fetchFRED(id,units='lin'){
-  const p=new URLSearchParams({series_id:id,api_key:FRED_KEY,file_type:'json',sort_order:'asc',limit:'60',units,frequency:'m'});
-  const r=await fetch('https://api.stlouisfed.org/fred/series/observations?'+p);
+  const p=new URLSearchParams({series_id:id,file_type:'json',sort_order:'asc',limit:'60',units,frequency:'m'});
+  const r=await fetch('/api/fred?'+p);
   if(!r.ok)throw new Error(id+' '+r.status);
   const d=await r.json();
   return(d.observations||[]).filter(o=>o.value!=='.'&&o.value!='').map(o=>({date:o.date,value:parseFloat(o.value)}));
@@ -245,7 +245,7 @@ function mapSIC(sic){
 async function loadTickers(){
   if(tickersCache)return tickersCache;
   document.getElementById('csStatus').textContent='loading…';
-  const r=await fetch('https://www.sec.gov/files/company_tickers.json');
+  const r=await fetch('/api/edgar');
   const d=await r.json();
   tickersCache=Object.values(d);
   document.getElementById('csStatus').textContent=tickersCache.length.toLocaleString()+' companies';
@@ -292,8 +292,8 @@ async function loadCompany(cik,name){
   document.getElementById('cpScore').style.color='#4e6282';
   try{
     const[subRaw,factsRaw]=await Promise.all([
-      fetch('https://data.sec.gov/submissions/CIK'+cik+'.json').then(r=>r.json()),
-      fetch('https://data.sec.gov/api/xbrl/companyfacts/CIK'+cik+'.json').then(r=>r.json()),
+      fetch('/api/edgar?type=submissions&cik='+cik).then(r=>r.json()),
+      fetch('/api/edgar?type=facts&cik='+cik).then(r=>r.json()),
     ]);
     const sic=subRaw.sic||'',ticker=(subRaw.tickers||[])[0]||'',sicDesc=subRaw.sicDescription||'';
     const industry=mapSIC(sic),gaap=factsRaw.facts?.['us-gaap']||{};
